@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- your_blur_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:startColor="#50177D"
+        android:centerColor="#3E177D"
+        android:endColor="#1A1C4C"
+        android:angle="1" />
+</shape>

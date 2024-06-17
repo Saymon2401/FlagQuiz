@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.SystemClock
@@ -27,7 +28,13 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
     private lateinit var listFlags: ArrayList<FlagData>
     private lateinit var listLevel: ArrayList<FlagData>
     lateinit var countryList: ArrayList<String>
-
+    //Media Player
+    lateinit var clickCard: MediaPlayer
+    lateinit var addMoney:MediaPlayer
+    lateinit var error:MediaPlayer
+    lateinit var windowMes:MediaPlayer
+    lateinit var backSound:MediaPlayer
+    lateinit var butt:MediaPlayer
 
     var isTimerStarted = false // timer
     var elapsedTime:Long = 0 //timer
@@ -43,17 +50,26 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Cash.init(this)
+        //MediaPlayer
+        clickCard = MediaPlayer.create(this,R.raw.click_cart)
+        addMoney = MediaPlayer.create(this,R.raw.add_money2)
+        error = MediaPlayer.create(this,R.raw.error)
+        windowMes = MediaPlayer.create(this,R.raw.window)
+        backSound = MediaPlayer.create(this,R.raw.back)
+        butt = MediaPlayer.create(this,R.raw.button)
 
         binding.countBitcoin.text = Cash.bitcoinBalance.toString()
         binding.countDiamond.text = Cash.diamondBalance.toString()
+
         supportActionBar?.hide()
         window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_FULLSCREEN// Скрываем Status Bar
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Скрываем Navigation Bar
-                        or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 )
 
         binding.btnBack.setOnClickListener{
+            butt.start()
             val intent = Intent(this,ChooseGameActivity::class.java)
             startActivity(intent)
         }
@@ -1191,12 +1207,14 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
         }
         var button = v as Button
         if (button.text == flagNow){
+            clickCard.start()
             count++
             countLevel++
             var recordTime = "00:00"
             button.setBackgroundDrawable(ContextCompat.getDrawable(this,R.drawable.btn_card_bg_true))
             if (countLevel==10){
                 //dialog win
+                windowMes.start()
                 val dialogBinding = layoutInflater.inflate(R.layout.dialog_win,null)
                 val dialogWin = Dialog(this)
                 dialogWin.setContentView(dialogBinding)
@@ -1205,7 +1223,9 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                 val get = dialogBinding.findViewById<Button>(R.id.get_it)
                 val bitDiam = dialogBinding.findViewById<ConstraintLayout>(R.id.bitcoin_diamond)
                 val recordTimeWin = dialogBinding.findViewById<TextView>(R.id.record_time)
-                val mainText = dialogBinding.findViewById<TextView>(R.id.main_text)
+                val bitcoin = dialogBinding.findViewById<TextView>(R.id.count_bitcoin)
+                val diamond = dialogBinding.findViewById<TextView>(R.id.count_diamond)
+
                 //time
                 binding.time.stop()
                 elapsedTime = binding.time.base - SystemClock.elapsedRealtime()
@@ -1219,686 +1239,721 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                 else secStr = "$sec"
                 when(Cash.ChooseContinent){
                     1 -> when(Cash.ChooseGame){
-                        1 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCountTime1!!.indexOf(":")
-                                        var minRec = Cash.AsiaCountTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCountTime1!!.substring(doubleDotRec+1,Cash.AsiaCountTime1!!.length)
-                                        if (Cash.AsiaCountTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCountTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.AsiaCountTime1 = recordTime
-                                        //Level
-                                        Cash.AsiaCountLvl1 = 10
+                        1 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCountTime1!!.indexOf(":")
+                                var minRec = Cash.AsiaCountTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCountTime1!!.substring(doubleDotRec+1,Cash.AsiaCountTime1!!.length)
+                                if (Cash.AsiaCountTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+100"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCountTime1.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCountTime2!!.indexOf(":")
-                                        var minRec = Cash.AsiaCountTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCountTime2!!.substring(doubleDotRec+1,Cash.AsiaCountTime2!!.length)
-                                        if (Cash.AsiaCountTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCountTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCountTime2 = recordTime
-                                        //Level
-                                        Cash.AsiaCountLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCountTime3!!.indexOf(":")
-                                        var minRec = Cash.AsiaCountTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCountTime3!!.substring(doubleDotRec+1,Cash.AsiaCountTime3!!.length)
-                                        if (Cash.AsiaCountTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCountTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCountTime3 = recordTime
-                                        //Level
-                                        Cash.AsiaCountLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCountTime4!!.indexOf(":")
-                                        var minRec = Cash.AsiaCountTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCountTime4!!.substring(doubleDotRec+1,Cash.AsiaCountTime4!!.length)
-                                        if (Cash.AsiaCountTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCountTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCountTime4 = recordTime
-                                        //Level
-                                        Cash.AsiaCountLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AsiaCountTime1 = recordTime
+                                //Level
+                                Cash.AsiaCountLvl1 = 10
                             }
-                        3 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCapTime1!!.indexOf(":")
-                                        var minRec = Cash.AsiaCapTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCapTime1!!.substring(doubleDotRec+1,Cash.AsiaCapTime1!!.length)
-                                        if (Cash.AsiaCapTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCapTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.AsiaCapTime1 = recordTime
-                                        //Level
-                                        Cash.AsiaCapLvl1 = 10
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCountTime2!!.indexOf(":")
+                                var minRec = Cash.AsiaCountTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCountTime2!!.substring(doubleDotRec+1,Cash.AsiaCountTime2!!.length)
+                                if (Cash.AsiaCountTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+150"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCountTime2.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCapTime2!!.indexOf(":")
-                                        var minRec = Cash.AsiaCapTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCapTime2!!.substring(doubleDotRec+1,Cash.AsiaCapTime2!!.length)
-                                        if (Cash.AsiaCapTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCapTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCapTime2 = recordTime
-                                        //Level
-                                        Cash.AsiaCapLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCapTime3!!.indexOf(":")
-                                        var minRec = Cash.AsiaCapTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCapTime3!!.substring(doubleDotRec+1,Cash.AsiaCapTime3!!.length)
-                                        if (Cash.AsiaCapTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCapTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCapTime3 = recordTime
-                                        //Level
-                                        Cash.AsiaCapLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaCapTime4!!.indexOf(":")
-                                        var minRec = Cash.AsiaCapTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaCapTime4!!.substring(doubleDotRec+1,Cash.AsiaCapTime4!!.length)
-                                        if (Cash.AsiaCapTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaCapTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaCapTime4 = recordTime
-                                        //Level
-                                        Cash.AsiaCapLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AsiaCountTime2 = recordTime
+                                //Level
+                                Cash.AsiaCountLvl2 = 10
                             }
-                        4 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaMapTime1!!.indexOf(":")
-                                        var minRec = Cash.AsiaMapTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaMapTime1!!.substring(doubleDotRec+1,Cash.AsiaMapTime1!!.length)
-                                        if (Cash.AsiaMapTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaMapTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.AsiaMapTime1 = recordTime
-                                        //Level
-                                        Cash.AsiaMapLvl1 = 10
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCountTime3!!.indexOf(":")
+                                var minRec = Cash.AsiaCountTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCountTime3!!.substring(doubleDotRec+1,Cash.AsiaCountTime3!!.length)
+                                if (Cash.AsiaCountTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+200"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCountTime3.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaMapTime2!!.indexOf(":")
-                                        var minRec = Cash.AsiaMapTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaMapTime2!!.substring(doubleDotRec+1,Cash.AsiaMapTime2!!.length)
-                                        if (Cash.AsiaMapTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaMapTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaMapTime2 = recordTime
-                                        //Level
-                                        Cash.AsiaMapLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaMapTime3!!.indexOf(":")
-                                        var minRec = Cash.AsiaMapTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaMapTime3!!.substring(doubleDotRec+1,Cash.AsiaMapTime3!!.length)
-                                        if (Cash.AsiaMapTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaMapTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaMapTime3 = recordTime
-                                        //Level
-                                        Cash.AsiaMapLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.AsiaMapTime4!!.indexOf(":")
-                                        var minRec = Cash.AsiaMapTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.AsiaMapTime4!!.substring(doubleDotRec+1,Cash.AsiaMapTime4!!.length)
-                                        if (Cash.AsiaMapTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.AsiaMapTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.AsiaMapTime4 = recordTime
-                                        //Level
-                                        Cash.AsiaMapLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AsiaCountTime3 = recordTime
+                                //Level
+                                Cash.AsiaCountLvl3 = 10
                             }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCountTime4!!.indexOf(":")
+                                var minRec = Cash.AsiaCountTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCountTime4!!.substring(doubleDotRec+1,Cash.AsiaCountTime4!!.length)
+                                if (Cash.AsiaCountTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+250"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCountTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaCountTime4 = recordTime
+                                //Level
+                                Cash.AsiaCountLvl4 = 10
+                            }
+                        }
+                        3 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCapTime1!!.indexOf(":")
+                                var minRec = Cash.AsiaCapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCapTime1!!.substring(doubleDotRec+1,Cash.AsiaCapTime1!!.length)
+                                if (Cash.AsiaCapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+100"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCapTime1.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.AsiaCapTime1 = recordTime
+                                //Level
+                                Cash.AsiaCapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCapTime2!!.indexOf(":")
+                                var minRec = Cash.AsiaCapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCapTime2!!.substring(doubleDotRec+1,Cash.AsiaCapTime2!!.length)
+                                if (Cash.AsiaCapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+150"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCapTime2.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaCapTime2 = recordTime
+                                //Level
+                                Cash.AsiaCapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCapTime3!!.indexOf(":")
+                                var minRec = Cash.AsiaCapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCapTime3!!.substring(doubleDotRec+1,Cash.AsiaCapTime3!!.length)
+                                if (Cash.AsiaCapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+200"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCapTime3.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaCapTime3 = recordTime
+                                //Level
+                                Cash.AsiaCapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaCapTime4!!.indexOf(":")
+                                var minRec = Cash.AsiaCapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaCapTime4!!.substring(doubleDotRec+1,Cash.AsiaCapTime4!!.length)
+                                if (Cash.AsiaCapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+250"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaCapTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaCapTime4 = recordTime
+                                //Level
+                                Cash.AsiaCapLvl4 = 10
+                            }
+                        }
+                        4 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaMapTime1!!.indexOf(":")
+                                var minRec = Cash.AsiaMapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaMapTime1!!.substring(doubleDotRec+1,Cash.AsiaMapTime1!!.length)
+                                if (Cash.AsiaMapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+100"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaMapTime1.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.AsiaMapTime1 = recordTime
+                                //Level
+                                Cash.AsiaMapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaMapTime2!!.indexOf(":")
+                                var minRec = Cash.AsiaMapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaMapTime2!!.substring(doubleDotRec+1,Cash.AsiaMapTime2!!.length)
+                                if (Cash.AsiaMapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+150"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaMapTime2.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaMapTime2 = recordTime
+                                //Level
+                                Cash.AsiaMapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaMapTime3!!.indexOf(":")
+                                var minRec = Cash.AsiaMapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaMapTime3!!.substring(doubleDotRec+1,Cash.AsiaMapTime3!!.length)
+                                if (Cash.AsiaMapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+200"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaMapTime3.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaMapTime3 = recordTime
+                                //Level
+                                Cash.AsiaMapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AsiaMapTime4!!.indexOf(":")
+                                var minRec = Cash.AsiaMapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AsiaMapTime4!!.substring(doubleDotRec+1,Cash.AsiaMapTime4!!.length)
+                                if (Cash.AsiaMapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+250"
+                                    diamond.text = "+1"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.AsiaMapTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.AsiaMapTime4 = recordTime
+                                //Level
+                                Cash.AsiaMapLvl4 = 10
+                            }
+                        }
                     }
                     2 -> when(Cash.ChooseGame){
-                        1 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCountTime1!!.indexOf(":")
-                                        var minRec = Cash.EuroCountTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCountTime1!!.substring(doubleDotRec+1,Cash.EuroCountTime1!!.length)
-                                        if (Cash.EuroCountTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCountTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.EuroCountTime1 = recordTime
-                                        //Level
-                                        Cash.EuroCountLvl1 = 10
+                        1 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCountTime1!!.indexOf(":")
+                                var minRec = Cash.EuroCountTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCountTime1!!.substring(doubleDotRec+1,Cash.EuroCountTime1!!.length)
+                                if (Cash.EuroCountTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+300"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCountTime1.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCountTime2!!.indexOf(":")
-                                        var minRec = Cash.EuroCountTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCountTime2!!.substring(doubleDotRec+1,Cash.EuroCountTime2!!.length)
-                                        if (Cash.EuroCountTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCountTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCountTime2 = recordTime
-                                        //Level
-                                        Cash.EuroCountLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCountTime3!!.indexOf(":")
-                                        var minRec = Cash.EuroCountTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCountTime3!!.substring(doubleDotRec+1,Cash.EuroCountTime3!!.length)
-                                        if (Cash.EuroCountTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCountTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCountTime3 = recordTime
-                                        //Level
-                                        Cash.EuroCountLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCountTime4!!.indexOf(":")
-                                        var minRec = Cash.EuroCountTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCountTime4!!.substring(doubleDotRec+1,Cash.EuroCountTime4!!.length)
-                                        if (Cash.EuroCountTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCountTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCountTime4 = recordTime
-                                        //Level
-                                        Cash.EuroCountLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.EuroCountTime1 = recordTime
+                                //Level
+                                Cash.EuroCountLvl1 = 10
                             }
-                        3 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCapTime1!!.indexOf(":")
-                                        var minRec = Cash.EuroCapTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCapTime1!!.substring(doubleDotRec+1,Cash.EuroCapTime1!!.length)
-                                        if (Cash.EuroCapTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCapTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.EuroCapTime1 = recordTime
-                                        //Level
-                                        Cash.EuroCapLvl1 = 10
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCountTime2!!.indexOf(":")
+                                var minRec = Cash.EuroCountTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCountTime2!!.substring(doubleDotRec+1,Cash.EuroCountTime2!!.length)
+                                if (Cash.EuroCountTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+350"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCountTime2.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCapTime2!!.indexOf(":")
-                                        var minRec = Cash.EuroCapTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCapTime2!!.substring(doubleDotRec+1,Cash.EuroCapTime2!!.length)
-                                        if (Cash.EuroCapTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCapTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCapTime2 = recordTime
-                                        //Level
-                                        Cash.EuroCapLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCapTime3!!.indexOf(":")
-                                        var minRec = Cash.EuroCapTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCapTime3!!.substring(doubleDotRec+1,Cash.EuroCapTime3!!.length)
-                                        if (Cash.EuroCapTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCapTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCapTime3 = recordTime
-                                        //Level
-                                        Cash.EuroCapLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroCapTime4!!.indexOf(":")
-                                        var minRec = Cash.EuroCapTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroCapTime4!!.substring(doubleDotRec+1,Cash.EuroCapTime4!!.length)
-                                        if (Cash.EuroCapTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroCapTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroCapTime4 = recordTime
-                                        //Level
-                                        Cash.EuroCapLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.EuroCountTime2 = recordTime
+                                //Level
+                                Cash.EuroCountLvl2 = 10
                             }
-                        4 -> {
-                                when(Cash.ChooseLevel){
-                                    1 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroMapTime1!!.indexOf(":")
-                                        var minRec = Cash.EuroMapTime1!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroMapTime1!!.substring(doubleDotRec+1,Cash.EuroMapTime1!!.length)
-                                        if (Cash.EuroMapTime1=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroMapTime1.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Log.d("TAG", "onClick: $recordTime")
-                                        Cash.EuroMapTime1 = recordTime
-                                        //Level
-                                        Cash.EuroMapLvl1 = 10
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCountTime3!!.indexOf(":")
+                                var minRec = Cash.EuroCountTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCountTime3!!.substring(doubleDotRec+1,Cash.EuroCountTime3!!.length)
+                                if (Cash.EuroCountTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+400"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCountTime3.toString()
                                     }
-                                    2 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroMapTime2!!.indexOf(":")
-                                        var minRec = Cash.EuroMapTime2!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroMapTime2!!.substring(doubleDotRec+1,Cash.EuroMapTime2!!.length)
-                                        if (Cash.EuroMapTime2=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroMapTime2.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroMapTime2 = recordTime
-                                        //Level
-                                        Cash.EuroMapLvl2 = 10
-                                    }
-                                    3 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroMapTime3!!.indexOf(":")
-                                        var minRec = Cash.EuroMapTime3!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroMapTime3!!.substring(doubleDotRec+1,Cash.EuroMapTime3!!.length)
-                                        if (Cash.EuroMapTime3=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroMapTime3.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroMapTime3 = recordTime
-                                        //Level
-                                        Cash.EuroMapLvl3 = 10
-                                    }
-                                    4 ->{
-                                        //record
-                                        var doubleDotRec = Cash.EuroMapTime4!!.indexOf(":")
-                                        var minRec = Cash.EuroMapTime4!!.substring(1,doubleDotRec)
-                                        var secRec = Cash.EuroMapTime4!!.substring(doubleDotRec+1,Cash.EuroMapTime4!!.length)
-                                        if (Cash.EuroMapTime4=="00:00"){
-                                            recordTime = "$minStr:$secStr"
-                                            dialogWin.show()
-                                        }else{
-                                            if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                                recordTime = "00:$secStr"
-                                            }else if (min!! < minRec.toInt()){
-                                                recordTime = "$minStr:$secStr"
-                                            }else{
-                                                recordTime = Cash.EuroMapTime4.toString()
-                                            }
-                                            //dialog Show
-                                            get.text = "Назад"
-                                            bitDiam.visibility = View.INVISIBLE
-                                            recordTimeWin.text = recordTime
-                                            recordTimeWin.visibility = View.VISIBLE
-                                            dialogWin.show()
-                                        }
-                                        Cash.EuroMapTime4 = recordTime
-                                        //Level
-                                        Cash.EuroMapLvl4 = 10
-                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.EuroCountTime3 = recordTime
+                                //Level
+                                Cash.EuroCountLvl3 = 10
                             }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCountTime4!!.indexOf(":")
+                                var minRec = Cash.EuroCountTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCountTime4!!.substring(doubleDotRec+1,Cash.EuroCountTime4!!.length)
+                                if (Cash.EuroCountTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+450"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCountTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroCountTime4 = recordTime
+                                //Level
+                                Cash.EuroCountLvl4 = 10
+                            }
+                        }
+                        3 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCapTime1!!.indexOf(":")
+                                var minRec = Cash.EuroCapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCapTime1!!.substring(doubleDotRec+1,Cash.EuroCapTime1!!.length)
+                                if (Cash.EuroCapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+300"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCapTime1.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.EuroCapTime1 = recordTime
+                                //Level
+                                Cash.EuroCapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCapTime2!!.indexOf(":")
+                                var minRec = Cash.EuroCapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCapTime2!!.substring(doubleDotRec+1,Cash.EuroCapTime2!!.length)
+                                if (Cash.EuroCapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+350"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCapTime2.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroCapTime2 = recordTime
+                                //Level
+                                Cash.EuroCapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCapTime3!!.indexOf(":")
+                                var minRec = Cash.EuroCapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCapTime3!!.substring(doubleDotRec+1,Cash.EuroCapTime3!!.length)
+                                if (Cash.EuroCapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+400"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCapTime3.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroCapTime3 = recordTime
+                                //Level
+                                Cash.EuroCapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroCapTime4!!.indexOf(":")
+                                var minRec = Cash.EuroCapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroCapTime4!!.substring(doubleDotRec+1,Cash.EuroCapTime4!!.length)
+                                if (Cash.EuroCapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+450"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroCapTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroCapTime4 = recordTime
+                                //Level
+                                Cash.EuroCapLvl4 = 10
+                            }
+                        }
+                        4 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroMapTime1!!.indexOf(":")
+                                var minRec = Cash.EuroMapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroMapTime1!!.substring(doubleDotRec+1,Cash.EuroMapTime1!!.length)
+                                if (Cash.EuroMapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+300"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroMapTime1.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.EuroMapTime1 = recordTime
+                                //Level
+                                Cash.EuroMapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroMapTime2!!.indexOf(":")
+                                var minRec = Cash.EuroMapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroMapTime2!!.substring(doubleDotRec+1,Cash.EuroMapTime2!!.length)
+                                if (Cash.EuroMapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+350"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroMapTime2.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroMapTime2 = recordTime
+                                //Level
+                                Cash.EuroMapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroMapTime3!!.indexOf(":")
+                                var minRec = Cash.EuroMapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroMapTime3!!.substring(doubleDotRec+1,Cash.EuroMapTime3!!.length)
+                                if (Cash.EuroMapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+400"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroMapTime3.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroMapTime3 = recordTime
+                                //Level
+                                Cash.EuroMapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.EuroMapTime4!!.indexOf(":")
+                                var minRec = Cash.EuroMapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.EuroMapTime4!!.substring(doubleDotRec+1,Cash.EuroMapTime4!!.length)
+                                if (Cash.EuroMapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+450"
+                                    diamond.text = "+2"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
+                                        recordTime = "$minStr:$secStr"
+                                    }else{
+                                        recordTime = Cash.EuroMapTime4.toString()
+                                    }
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
+                                }
+                                Cash.EuroMapTime4 = recordTime
+                                //Level
+                                Cash.EuroMapLvl4 = 10
+                            }
+                        }
                     }
                     3 -> when(Cash.ChooseGame){
                         1 -> when(Cash.ChooseLevel){
@@ -1909,6 +1964,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmCountTime1!!.substring(doubleDotRec+1,Cash.AmCountTime1!!.length)
                                         if (Cash.AmCountTime1=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1000"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -1937,6 +1994,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmCountTime2!!.substring(doubleDotRec+1,Cash.AmCountTime2!!.length)
                                         if (Cash.AmCountTime2=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1250"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -1966,6 +2025,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmCapTime1!!.substring(doubleDotRec+1,Cash.AmCapTime1!!.length)
                                         if (Cash.AmCapTime1=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1000"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -1994,6 +2055,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmCapTime2!!.substring(doubleDotRec+1,Cash.AmCapTime2!!.length)
                                         if (Cash.AmCapTime2=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1250"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -2023,6 +2086,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmMapTime1!!.substring(doubleDotRec+1,Cash.AmMapTime1!!.length)
                                         if (Cash.AmMapTime1=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1000"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -2051,6 +2116,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                         var secRec = Cash.AmMapTime2!!.substring(doubleDotRec+1,Cash.AmMapTime2!!.length)
                                         if (Cash.AmMapTime2=="00:00"){
                                             recordTime = "$minStr:$secStr"
+                                            bitcoin.text = "+1250"
+                                            diamond.text = "+6"
                                             dialogWin.show()
                                         }else{
                                             if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
@@ -2074,343 +2141,361 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                         }
                     }
                     4 -> when(Cash.ChooseGame){
-                        1 -> {
-                            when(Cash.ChooseLevel){
-                                1 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCountTime1!!.indexOf(":")
-                                    var minRec = Cash.AfricaCountTime1!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCountTime1!!.substring(doubleDotRec+1,Cash.AfricaCountTime1!!.length)
-                                    if (Cash.AfricaCountTime1=="00:00"){
+                        1 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCountTime1!!.indexOf(":")
+                                var minRec = Cash.AfricaCountTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCountTime1!!.substring(doubleDotRec+1,Cash.AfricaCountTime1!!.length)
+                                if (Cash.AfricaCountTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1300"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCountTime1.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCountTime1.toString()
                                     }
-                                    Log.d("TAG", "onClick: $recordTime")
-                                    Cash.AfricaCountTime1 = recordTime
-                                    //Level
-                                    Cash.AfricaCountLvl1 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                2 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCountTime2!!.indexOf(":")
-                                    var minRec = Cash.AfricaCountTime2!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCountTime2!!.substring(doubleDotRec+1,Cash.AfricaCountTime2!!.length)
-                                    if (Cash.AfricaCountTime2=="00:00"){
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.AfricaCountTime1 = recordTime
+                                //Level
+                                Cash.AfricaCountLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCountTime2!!.indexOf(":")
+                                var minRec = Cash.AfricaCountTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCountTime2!!.substring(doubleDotRec+1,Cash.AfricaCountTime2!!.length)
+                                if (Cash.AfricaCountTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1400"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCountTime2.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCountTime2.toString()
                                     }
-                                    Cash.AfricaCountTime2 = recordTime
-                                    //Level
-                                    Cash.AfricaCountLvl2 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                3 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCountTime3!!.indexOf(":")
-                                    var minRec = Cash.AfricaCountTime3!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCountTime3!!.substring(doubleDotRec+1,Cash.AfricaCountTime3!!.length)
-                                    if (Cash.AfricaCountTime3=="00:00"){
+                                Cash.AfricaCountTime2 = recordTime
+                                //Level
+                                Cash.AfricaCountLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCountTime3!!.indexOf(":")
+                                var minRec = Cash.AfricaCountTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCountTime3!!.substring(doubleDotRec+1,Cash.AfricaCountTime3!!.length)
+                                if (Cash.AfricaCountTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1500"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCountTime3.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCountTime3.toString()
                                     }
-                                    Cash.AfricaCountTime3 = recordTime
-                                    //Level
-                                    Cash.AfricaCountLvl3 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                4 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCountTime4!!.indexOf(":")
-                                    var minRec = Cash.AfricaCountTime4!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCountTime4!!.substring(doubleDotRec+1,Cash.AfricaCountTime4!!.length)
-                                    if (Cash.AfricaCountTime4=="00:00"){
+                                Cash.AfricaCountTime3 = recordTime
+                                //Level
+                                Cash.AfricaCountLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCountTime4!!.indexOf(":")
+                                var minRec = Cash.AfricaCountTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCountTime4!!.substring(doubleDotRec+1,Cash.AfricaCountTime4!!.length)
+                                if (Cash.AfricaCountTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1600"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCountTime4.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCountTime4.toString()
                                     }
-                                    Cash.AfricaCountTime4 = recordTime
-                                    //Level
-                                    Cash.AfricaCountLvl4 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AfricaCountTime4 = recordTime
+                                //Level
+                                Cash.AfricaCountLvl4 = 10
                             }
                         }
-                        3 -> {
-                            when(Cash.ChooseLevel){
-                                1 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCapTime1!!.indexOf(":")
-                                    var minRec = Cash.AfricaCapTime1!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCapTime1!!.substring(doubleDotRec+1,Cash.AfricaCapTime1!!.length)
-                                    if (Cash.AfricaCapTime1=="00:00"){
+                        3 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCapTime1!!.indexOf(":")
+                                var minRec = Cash.AfricaCapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCapTime1!!.substring(doubleDotRec+1,Cash.AfricaCapTime1!!.length)
+                                if (Cash.AfricaCapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1300"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCapTime1.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCapTime1.toString()
                                     }
-                                    Log.d("TAG", "onClick: $recordTime")
-                                    Cash.AfricaCapTime1 = recordTime
-                                    //Level
-                                    Cash.AfricaCapLvl1 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                2 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCapTime2!!.indexOf(":")
-                                    var minRec = Cash.AfricaCapTime2!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCapTime2!!.substring(doubleDotRec+1,Cash.AfricaCapTime2!!.length)
-                                    if (Cash.AfricaCapTime2=="00:00"){
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.AfricaCapTime1 = recordTime
+                                //Level
+                                Cash.AfricaCapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCapTime2!!.indexOf(":")
+                                var minRec = Cash.AfricaCapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCapTime2!!.substring(doubleDotRec+1,Cash.AfricaCapTime2!!.length)
+                                if (Cash.AfricaCapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1400"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCapTime2.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCapTime2.toString()
                                     }
-                                    Cash.AfricaCapTime2 = recordTime
-                                    //Level
-                                    Cash.AfricaCapLvl2 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                3 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCapTime3!!.indexOf(":")
-                                    var minRec = Cash.AfricaCapTime3!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCapTime3!!.substring(doubleDotRec+1,Cash.AfricaCapTime3!!.length)
-                                    if (Cash.AfricaCapTime3=="00:00"){
+                                Cash.AfricaCapTime2 = recordTime
+                                //Level
+                                Cash.AfricaCapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCapTime3!!.indexOf(":")
+                                var minRec = Cash.AfricaCapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCapTime3!!.substring(doubleDotRec+1,Cash.AfricaCapTime3!!.length)
+                                if (Cash.AfricaCapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1500"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCapTime3.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCapTime3.toString()
                                     }
-                                    Cash.AfricaCapTime3 = recordTime
-                                    //Level
-                                    Cash.AfricaCapLvl3 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                4 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaCapTime4!!.indexOf(":")
-                                    var minRec = Cash.AfricaCapTime4!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaCapTime4!!.substring(doubleDotRec+1,Cash.AfricaCapTime4!!.length)
-                                    if (Cash.AfricaCapTime4=="00:00"){
+                                Cash.AfricaCapTime3 = recordTime
+                                //Level
+                                Cash.AfricaCapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaCapTime4!!.indexOf(":")
+                                var minRec = Cash.AfricaCapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaCapTime4!!.substring(doubleDotRec+1,Cash.AfricaCapTime4!!.length)
+                                if (Cash.AfricaCapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1600"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaCapTime4.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaCapTime4.toString()
                                     }
-                                    Cash.AfricaCapTime4 = recordTime
-                                    //Level
-                                    Cash.AfricaCapLvl4 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AfricaCapTime4 = recordTime
+                                //Level
+                                Cash.AfricaCapLvl4 = 10
                             }
                         }
-                        4 -> {
-                            when(Cash.ChooseLevel){
-                                1 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaMapTime1!!.indexOf(":")
-                                    var minRec = Cash.AfricaMapTime1!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaMapTime1!!.substring(doubleDotRec+1,Cash.AfricaMapTime1!!.length)
-                                    if (Cash.AfricaMapTime1=="00:00"){
+                        4 -> when(Cash.ChooseLevel){
+                            1 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaMapTime1!!.indexOf(":")
+                                var minRec = Cash.AfricaMapTime1!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaMapTime1!!.substring(doubleDotRec+1,Cash.AfricaMapTime1!!.length)
+                                if (Cash.AfricaMapTime1=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1300"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaMapTime1.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaMapTime1.toString()
                                     }
-                                    Log.d("TAG", "onClick: $recordTime")
-                                    Cash.AfricaMapTime1 = recordTime
-                                    //Level
-                                    Cash.AfricaMapLvl1 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                2 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaMapTime2!!.indexOf(":")
-                                    var minRec = Cash.AfricaMapTime2!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaMapTime2!!.substring(doubleDotRec+1,Cash.AfricaMapTime2!!.length)
-                                    if (Cash.AfricaMapTime2=="00:00"){
+                                Log.d("TAG", "onClick: $recordTime")
+                                Cash.AfricaMapTime1 = recordTime
+                                //Level
+                                Cash.AfricaMapLvl1 = 10
+                            }
+                            2 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaMapTime2!!.indexOf(":")
+                                var minRec = Cash.AfricaMapTime2!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaMapTime2!!.substring(doubleDotRec+1,Cash.AfricaMapTime2!!.length)
+                                if (Cash.AfricaMapTime2=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1400"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaMapTime2.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaMapTime2.toString()
                                     }
-                                    Cash.AfricaMapTime2 = recordTime
-                                    //Level
-                                    Cash.AfricaMapLvl2 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                3 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaMapTime3!!.indexOf(":")
-                                    var minRec = Cash.AfricaMapTime3!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaMapTime3!!.substring(doubleDotRec+1,Cash.AfricaMapTime3!!.length)
-                                    if (Cash.AfricaMapTime3=="00:00"){
+                                Cash.AfricaMapTime2 = recordTime
+                                //Level
+                                Cash.AfricaMapLvl2 = 10
+                            }
+                            3 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaMapTime3!!.indexOf(":")
+                                var minRec = Cash.AfricaMapTime3!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaMapTime3!!.substring(doubleDotRec+1,Cash.AfricaMapTime3!!.length)
+                                if (Cash.AfricaMapTime3=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1500"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaMapTime3.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaMapTime3.toString()
                                     }
-                                    Cash.AfricaMapTime3 = recordTime
-                                    //Level
-                                    Cash.AfricaMapLvl3 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
-                                4 ->{
-                                    //record
-                                    var doubleDotRec = Cash.AfricaMapTime4!!.indexOf(":")
-                                    var minRec = Cash.AfricaMapTime4!!.substring(1,doubleDotRec)
-                                    var secRec = Cash.AfricaMapTime4!!.substring(doubleDotRec+1,Cash.AfricaMapTime4!!.length)
-                                    if (Cash.AfricaMapTime4=="00:00"){
+                                Cash.AfricaMapTime3 = recordTime
+                                //Level
+                                Cash.AfricaMapLvl3 = 10
+                            }
+                            4 ->{
+                                //record
+                                var doubleDotRec = Cash.AfricaMapTime4!!.indexOf(":")
+                                var minRec = Cash.AfricaMapTime4!!.substring(1,doubleDotRec)
+                                var secRec = Cash.AfricaMapTime4!!.substring(doubleDotRec+1,Cash.AfricaMapTime4!!.length)
+                                if (Cash.AfricaMapTime4=="00:00"){
+                                    recordTime = "$minStr:$secStr"
+                                    bitcoin.text = "+1600"
+                                    diamond.text = "+7"
+                                    dialogWin.show()
+                                }else{
+                                    if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
+                                        recordTime = "00:$secStr"
+                                    }else if (min!! < minRec.toInt()){
                                         recordTime = "$minStr:$secStr"
-                                        dialogWin.show()
                                     }else{
-                                        if (min?.toInt() == minRec.toInt() && sec!! <= secRec.toInt()){
-                                            recordTime = "00:$secStr"
-                                        }else if (min!! < minRec.toInt()){
-                                            recordTime = "$minStr:$secStr"
-                                        }else{
-                                            recordTime = Cash.AfricaMapTime4.toString()
-                                        }
-                                        //dialog Show
-                                        get.text = "Назад"
-                                        bitDiam.visibility = View.INVISIBLE
-                                        recordTimeWin.text = recordTime
-                                        recordTimeWin.visibility = View.VISIBLE
-                                        dialogWin.show()
+                                        recordTime = Cash.AfricaMapTime4.toString()
                                     }
-                                    Cash.AfricaMapTime4 = recordTime
-                                    //Level
-                                    Cash.AfricaMapLvl4 = 10
+                                    //dialog Show
+                                    get.text = "Назад"
+                                    bitDiam.visibility = View.INVISIBLE
+                                    recordTimeWin.text = recordTime
+                                    recordTimeWin.visibility = View.VISIBLE
+                                    dialogWin.show()
                                 }
+                                Cash.AfricaMapTime4 = recordTime
+                                //Level
+                                Cash.AfricaMapLvl4 = 10
                             }
                         }
                     }
@@ -2425,27 +2510,32 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                             Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCountCreditLvl1 = false
+                                            addMoney.start()
+
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AsiaCountCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+150
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCountCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.AsiaCountCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+200
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCountCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.AsiaCountCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+250
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCountCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
@@ -2455,27 +2545,31 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                             Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AsiaCapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+150
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.AsiaCapCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+200
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCapCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.AsiaCapCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+250
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaCapCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
@@ -2485,27 +2579,31 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                                             Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaMapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AsiaMapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+150
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaMapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.AsiaMapCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+200
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaMapCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.AsiaMapCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+250
                                             Cash.diamondBalance = Cash.diamondBalance!!+1
                                             Cash.AsiaMapCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
@@ -2514,90 +2612,102 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                             1 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.EuroCountCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+300
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCountCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.EuroCountCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+350
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCountCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.EuroCountCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+400
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCountCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.EuroCountCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+450
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCountCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
                             3 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.EuroCapCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+300
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.EuroCapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+350
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.EuroCapCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+400
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCapCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.EuroCapCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+450
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroCapCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
                             4 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.EuroMapCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+300
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroMapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.EuroMapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+350
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroMapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                     3 -> {
                                         if (Cash.EuroMapCreditLvl3!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+400
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroMapCreditLvl3 = false
+                                            addMoney.start()
                                         }
                                     }
                                     4 -> {
                                         if (Cash.EuroMapCreditLvl4!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+450
+                                            Cash.diamondBalance = Cash.diamondBalance!!+2
                                             Cash.EuroMapCreditLvl4 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
@@ -2606,48 +2716,54 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                             1 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.AmCountCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1000
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmCountCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AmCountCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1250
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmCountCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
                             3 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.AmCapCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1000
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmCapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AmCapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1250
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmCapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
                             4 -> when (Cash.ChooseLevel) {
                                     1 -> {
                                         if (Cash.AmMapCreditLvl1!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1000
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmMapCreditLvl1 = false
+                                            addMoney.start()
                                         }
                                     }
                                     2 -> {
                                         if (Cash.AmMapCreditLvl2!!){
-                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                            Cash.diamondBalance = Cash.diamondBalance!!+1
+                                            Cash.bitcoinBalance = Cash.bitcoinBalance!!+1250
+                                            Cash.diamondBalance = Cash.diamondBalance!!+6
                                             Cash.AmMapCreditLvl2 = false
+                                            addMoney.start()
                                         }
                                     }
                                 }
@@ -2656,90 +2772,102 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                             1 -> when (Cash.ChooseLevel) {
                                 1 -> {
                                     if (Cash.AfricaCountCreditLvl1!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1300
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCountCreditLvl1 = false
+                                        addMoney.start()
                                     }
                                 }
                                 2 -> {
                                     if (Cash.AfricaCountCreditLvl2!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1400
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCountCreditLvl2 = false
+                                        addMoney.start()
                                     }
                                 }
                                 3 -> {
                                     if (Cash.AfricaCountCreditLvl3!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1500
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCountCreditLvl3 = false
+                                        addMoney.start()
                                     }
                                 }
                                 4 -> {
                                     if (Cash.AfricaCountCreditLvl4!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1600
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCountCreditLvl4 = false
+                                        addMoney.start()
                                     }
                                 }
                             }
                             3 -> when (Cash.ChooseLevel) {
                                 1 -> {
                                     if (Cash.AfricaCapCreditLvl1!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1300
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCapCreditLvl1 = false
+                                        addMoney.start()
                                     }
                                 }
                                 2 -> {
                                     if (Cash.AfricaCapCreditLvl2!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1400
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCapCreditLvl2 = false
+                                        addMoney.start()
                                     }
                                 }
                                 3 -> {
                                     if (Cash.AfricaCapCreditLvl3!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1500
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCapCreditLvl3 = false
+                                        addMoney.start()
                                     }
                                 }
                                 4 -> {
                                     if (Cash.AfricaCapCreditLvl4!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1600
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaCapCreditLvl4 = false
+                                        addMoney.start()
                                     }
                                 }
                             }
                             4 -> when (Cash.ChooseLevel) {
                                 1 -> {
                                     if (Cash.AfricaMapCreditLvl1!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1300
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaMapCreditLvl1 = false
+                                        addMoney.start()
                                     }
                                 }
                                 2 -> {
                                     if (Cash.AfricaMapCreditLvl2!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1400
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaMapCreditLvl2 = false
+                                        addMoney.start()
                                     }
                                 }
                                 3 -> {
                                     if (Cash.AfricaMapCreditLvl3!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1500
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaMapCreditLvl3 = false
+                                        addMoney.start()
                                     }
                                 }
                                 4 -> {
                                     if (Cash.AfricaMapCreditLvl4!!){
-                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+100
-                                        Cash.diamondBalance = Cash.diamondBalance!!+1
+                                        Cash.bitcoinBalance = Cash.bitcoinBalance!!+1600
+                                        Cash.diamondBalance = Cash.diamondBalance!!+7
                                         Cash.AfricaMapCreditLvl4 = false
+                                        addMoney.start()
                                     }
                                 }
                             }
@@ -2758,6 +2886,7 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                 setData(count)
             },250)
         }else{
+            error.start()
             //vibrator
             val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             button.setBackgroundDrawable(ContextCompat.getDrawable(this,R.drawable.btn_card_bg_false)) // change to red
@@ -2974,6 +3103,7 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                     }
                 }
                 //dialog lose
+                windowMes.start()
                 val dialogBinding = layoutInflater.inflate(R.layout.dialog_lose,null)
                 val dialogLose = Dialog(this)
                 dialogLose.setContentView(dialogBinding)
@@ -2984,12 +3114,14 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                 val restart = dialogBinding.findViewById<Button>(R.id.restart)
                 // button back
                 back.setOnClickListener {
+                    butt.start()
                     dialogLose.dismiss()
                     val intent = Intent(this,ChooseGameActivity::class.java)
                     startActivity(intent)
                 }
                 // buton restart
                 restart.setOnClickListener {
+                    butt.start()
                     binding.live1.setImageResource(R.drawable.icon_live_true)
                     binding.live2.setImageResource(R.drawable.icon_live_true)
                     binding.live3.setImageResource(R.drawable.icon_live_true)
@@ -3019,5 +3151,17 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
         if (vibrator.hasVibrator()) {
             vibrator.vibrate(duration)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        backSound.isLooping = true
+        backSound.setVolume(0.2f, 0.2f)
+        backSound.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        backSound.pause()
     }
 }

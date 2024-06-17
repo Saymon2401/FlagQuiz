@@ -1,6 +1,7 @@
 package com.example.flagquiz
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,11 +16,19 @@ import com.example.flagquiz.models.Cash
 
 class ChooseGameActivity : AppCompatActivity() {
     lateinit var binding: ActivityChooseGameBinding
+    //MediaPLayer
+    lateinit var backSound: MediaPlayer
+    lateinit var butt: MediaPlayer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChooseGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Cash.init(this)
+        //MediaPLayer
+        backSound = MediaPlayer.create(this,R.raw.back)
+        butt = MediaPlayer.create(this,R.raw.button)
+
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_FULLSCREEN// Скрываем Status Bar
                         or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // Скрываем Navigation Bar
@@ -31,6 +40,7 @@ class ChooseGameActivity : AppCompatActivity() {
         Log.d("Level","Continent: ${Cash.ChooseContinent}")
 
         binding.btnBack.setOnClickListener{
+            butt.start()
             val intent = Intent(this,LevelActivity::class.java)
             startActivity(intent)
         }
@@ -49,20 +59,24 @@ class ChooseGameActivity : AppCompatActivity() {
             }
         }
         binding.card1.setOnClickListener {
+            butt.start()
             Cash.ChooseGame = 1
             val intent = Intent(this,GameActivity::class.java)
             startActivity(intent)
         }
         binding.card2.setOnClickListener {
+            butt.start()
             val intent = Intent(this,GameQuizActivity::class.java)
             startActivity(intent)
         }
         binding.card3.setOnClickListener {
+            butt.start()
             Cash.ChooseGame = 3
             val intent = Intent(this,GameActivity::class.java)
             startActivity(intent)
         }
         binding.card4.setOnClickListener {
+            butt.start()
             Cash.ChooseGame = 4
             val intent = Intent(this,GameActivity::class.java)
             startActivity(intent)
@@ -73,6 +87,9 @@ class ChooseGameActivity : AppCompatActivity() {
                 1 -> {
                         binding.card1Level.text = Cash.AsiaCountLvl1.toString()
                         binding.card1Time.text = Cash.AsiaCountTime1.toString()
+
+                        binding.card2Level.text = Cash.AsiaQuizLvl1.toString()
+                        binding.card2Time.text = Cash.AsiaQuizTime1.toString()
 
                         binding.card3Level.text = Cash.AsiaCapLvl1.toString()
                         binding.card3Time.text = Cash.AsiaCapTime1.toString()
@@ -89,6 +106,9 @@ class ChooseGameActivity : AppCompatActivity() {
                         binding.card1Level.text = Cash.AsiaCountLvl2.toString()
                         binding.card1Time.text = Cash.AsiaCountTime2.toString()
 
+                        binding.card2Level.text = Cash.AsiaQuizLvl2.toString()
+                        binding.card2Time.text = Cash.AsiaQuizTime2.toString()
+
                         binding.card3Level.text = Cash.AsiaCapLvl2.toString()
                         binding.card3Time.text = Cash.AsiaCapTime2.toString()
 
@@ -104,6 +124,9 @@ class ChooseGameActivity : AppCompatActivity() {
                         binding.card1Level.text = Cash.AsiaCountLvl3.toString()
                         binding.card1Time.text = Cash.AsiaCountTime3.toString()
 
+                        binding.card2Level.text = Cash.AsiaQuizLvl3.toString()
+                        binding.card2Time.text = Cash.AsiaQuizTime3.toString()
+
                         binding.card3Level.text = Cash.AsiaCapLvl3.toString()
                         binding.card3Time.text = Cash.AsiaCapTime3.toString()
 
@@ -118,6 +141,9 @@ class ChooseGameActivity : AppCompatActivity() {
                 4 -> {
                         binding.card1Level.text = Cash.AsiaCountLvl4.toString()
                         binding.card1Time.text = Cash.AsiaCountTime4.toString()
+
+                        binding.card2Level.text = Cash.AsiaQuizLvl4.toString()
+                        binding.card2Time.text = Cash.AsiaQuizTime4.toString()
 
                         binding.card3Level.text = Cash.AsiaCapLvl4.toString()
                         binding.card3Time.text = Cash.AsiaCapTime4.toString()
@@ -136,6 +162,9 @@ class ChooseGameActivity : AppCompatActivity() {
                         binding.card1Level.text = Cash.EuroCountLvl1.toString()
                         binding.card1Time.text = Cash.EuroCountTime1.toString()
 
+                        binding.card2Level.text = Cash.EuroQuizLvl1.toString()
+                        binding.card2Time.text = Cash.EuroQuizTime1.toString()
+
                         binding.card3Level.text = Cash.EuroCapLvl1.toString()
                         binding.card3Time.text = Cash.EuroCapTime1.toString()
 
@@ -148,70 +177,85 @@ class ChooseGameActivity : AppCompatActivity() {
                         if (Cash.EuroMapLvl1==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
                     }
                 2 -> {
-                        binding.card1Level.text = Cash.EuroCountLvl2.toString()
-                        binding.card1Time.text = Cash.EuroCountTime2.toString()
+                    binding.card1Level.text = Cash.EuroCountLvl2.toString()
+                    binding.card1Time.text = Cash.EuroCountTime2.toString()
 
-                        binding.card3Level.text = Cash.EuroCapLvl2.toString()
-                        binding.card3Time.text = Cash.EuroCapTime2.toString()
+                    binding.card2Level.text = Cash.EuroQuizLvl2.toString()
+                    binding.card2Time.text = Cash.EuroQuizTime2.toString()
 
-                        binding.card4Level.text = Cash.EuroMapLvl2.toString()
-                        binding.card4Time.text = Cash.EuroMapTime2.toString()
+                    binding.card3Level.text = Cash.EuroCapLvl2.toString()
+                    binding.card3Time.text = Cash.EuroCapTime2.toString()
 
-                        if (Cash.EuroCountLvl2==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroQuizLvl2==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroCapLvl2==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroMapLvl2==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    binding.card4Level.text = Cash.EuroMapLvl2.toString()
+                    binding.card4Time.text = Cash.EuroMapTime2.toString()
+
+                    if (Cash.EuroCountLvl2==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroQuizLvl2==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroCapLvl2==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroMapLvl2==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
                     }
                 3 -> {
-                        binding.card1Level.text = Cash.EuroCountLvl3.toString()
-                        binding.card1Time.text = Cash.EuroCountTime3.toString()
+                    binding.card1Level.text = Cash.EuroCountLvl3.toString()
+                    binding.card1Time.text = Cash.EuroCountTime3.toString()
 
-                        binding.card3Level.text = Cash.EuroCapLvl3.toString()
-                        binding.card3Time.text = Cash.EuroCapTime3.toString()
+                    binding.card2Level.text = Cash.EuroQuizLvl3.toString()
+                    binding.card2Time.text = Cash.EuroQuizTime3.toString()
 
-                        binding.card4Level.text = Cash.EuroMapLvl3.toString()
-                        binding.card4Time.text = Cash.EuroMapTime3.toString()
+                    binding.card3Level.text = Cash.EuroCapLvl3.toString()
+                    binding.card3Time.text = Cash.EuroCapTime3.toString()
 
-                        if (Cash.EuroCountLvl3==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroQuizLvl3==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroCapLvl3==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroMapLvl3==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    binding.card4Level.text = Cash.EuroMapLvl3.toString()
+                    binding.card4Time.text = Cash.EuroMapTime3.toString()
+
+                    if (Cash.EuroCountLvl3==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroQuizLvl3==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroCapLvl3==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroMapLvl3==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
                     }
                 4 -> {
-                        binding.card1Level.text = Cash.EuroCountLvl4.toString()
-                        binding.card1Time.text = Cash.EuroCountTime4.toString()
+                    binding.card1Level.text = Cash.EuroCountLvl4.toString()
+                    binding.card1Time.text = Cash.EuroCountTime4.toString()
 
-                        binding.card3Level.text = Cash.EuroCapLvl4.toString()
-                        binding.card3Time.text = Cash.EuroCapTime4.toString()
+                    binding.card2Level.text = Cash.EuroQuizLvl4.toString()
+                    binding.card2Time.text = Cash.EuroQuizTime4.toString()
 
-                        binding.card4Level.text = Cash.EuroMapLvl4.toString()
-                        binding.card4Time.text = Cash.EuroMapTime4.toString()
+                    binding.card3Level.text = Cash.EuroCapLvl4.toString()
+                    binding.card3Time.text = Cash.EuroCapTime4.toString()
 
-                        if (Cash.EuroCountLvl4==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroQuizLvl4==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroCapLvl4==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.EuroMapLvl4==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                    }
+                    binding.card4Level.text = Cash.EuroMapLvl4.toString()
+                    binding.card4Time.text = Cash.EuroMapTime4.toString()
+
+                    if (Cash.EuroCountLvl4==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroQuizLvl4==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroCapLvl4==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.EuroMapLvl4==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                }
             }
             3 -> when(Cash.ChooseLevel){
                 1 -> {
-                        binding.card1Level.text = Cash.AmCountLvl1.toString()
-                        binding.card1Time.text = Cash.AmCountTime1.toString()
+                    binding.card1Level.text = Cash.AmCountLvl1.toString()
+                    binding.card1Time.text = Cash.AmCountTime1.toString()
 
-                        binding.card3Level.text = Cash.AmCapLvl1.toString()
-                        binding.card3Time.text = Cash.AmCapTime1.toString()
+                    binding.card2Level.text = Cash.AmQuizLvl1.toString()
+                    binding.card2Time.text = Cash.AmQuizTime1.toString()
 
-                        binding.card4Level.text = Cash.AmMapLvl1.toString()
-                        binding.card4Time.text = Cash.AmMapTime1.toString()
+                    binding.card3Level.text = Cash.AmCapLvl1.toString()
+                    binding.card3Time.text = Cash.AmCapTime1.toString()
 
-                        if (Cash.AmCountLvl1==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.AmQuizLvl1==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.AmCapLvl1==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                        if (Cash.AmMapLvl1==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
-                    }
+                    binding.card4Level.text = Cash.AmMapLvl1.toString()
+                    binding.card4Time.text = Cash.AmMapTime1.toString()
+
+                    if (Cash.AmCountLvl1==10) binding.star1.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.AmQuizLvl1==10) binding.star2.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.AmCapLvl1==10) binding.star3.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                    if (Cash.AmMapLvl1==10) binding.star4.setImageDrawable(ContextCompat.getDrawable(this,R.drawable.icon_star_true))
+                }
                 2 -> {
                         binding.card1Level.text = Cash.AmCountLvl2.toString()
                         binding.card1Time.text = Cash.AmCountTime2.toString()
+
+                    binding.card2Level.text = Cash.AmQuizLvl2.toString()
+                    binding.card2Time.text = Cash.AmQuizTime2.toString()
 
                         binding.card3Level.text = Cash.AmCapLvl2.toString()
                         binding.card3Time.text = Cash.AmCapTime2.toString()
@@ -230,6 +274,9 @@ class ChooseGameActivity : AppCompatActivity() {
                     binding.card1Level.text = Cash.AfricaCountLvl1.toString()
                     binding.card1Time.text = Cash.AfricaCountTime1.toString()
 
+                    binding.card2Level.text = Cash.AfricaQuizLvl1.toString()
+                    binding.card2Time.text = Cash.AfricaQuizTime1.toString()
+
                     binding.card3Level.text = Cash.AfricaCapLvl1.toString()
                     binding.card3Time.text = Cash.AfricaCapTime1.toString()
 
@@ -244,6 +291,9 @@ class ChooseGameActivity : AppCompatActivity() {
                 2 -> {
                     binding.card1Level.text = Cash.AfricaCountLvl2.toString()
                     binding.card1Time.text = Cash.AfricaCountTime2.toString()
+
+                    binding.card2Level.text = Cash.AfricaQuizLvl2.toString()
+                    binding.card2Time.text = Cash.AfricaQuizTime2.toString()
 
                     binding.card3Level.text = Cash.AfricaCapLvl2.toString()
                     binding.card3Time.text = Cash.AfricaCapTime2.toString()
@@ -260,6 +310,9 @@ class ChooseGameActivity : AppCompatActivity() {
                     binding.card1Level.text = Cash.AfricaCountLvl3.toString()
                     binding.card1Time.text = Cash.AfricaCountTime3.toString()
 
+                    binding.card2Level.text = Cash.AfricaQuizLvl3.toString()
+                    binding.card2Time.text = Cash.AfricaQuizTime3.toString()
+
                     binding.card3Level.text = Cash.AfricaCapLvl3.toString()
                     binding.card3Time.text = Cash.AfricaCapTime3.toString()
 
@@ -275,6 +328,9 @@ class ChooseGameActivity : AppCompatActivity() {
                     binding.card1Level.text = Cash.AfricaCountLvl4.toString()
                     binding.card1Time.text = Cash.AfricaCountTime4.toString()
 
+                    binding.card2Level.text = Cash.AfricaQuizLvl4.toString()
+                    binding.card2Time.text = Cash.AfricaQuizTime4.toString()
+
                     binding.card3Level.text = Cash.AfricaCapLvl4.toString()
                     binding.card3Time.text = Cash.AfricaCapTime4.toString()
 
@@ -288,5 +344,15 @@ class ChooseGameActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    override fun onResume() {
+        super.onResume()
+        backSound.isLooping = true
+        backSound.setVolume(0.2f, 0.2f)
+        backSound.start()
+    }
+    override fun onPause() {
+        super.onPause()
+        backSound.pause()
     }
 }

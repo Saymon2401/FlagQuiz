@@ -70,7 +70,18 @@
         android:layout_marginRight="20dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-
+    
+<!--card1-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card1No"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginRight="-100dp"
+        android:layout_marginTop="20dp"
+        android:elevation="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/btn_back"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card1"
         android:layout_width="0dp"
@@ -118,13 +129,113 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+<!--card2-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card2_no"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginLeft="-100dp"
+        android:layout_marginTop="20dp"
+        android:elevation="5dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card1" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card2_close"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-100dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card1">
+        <Button
+            android:id="@+id/btn_euro_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textAllCaps="false"
+            android:text="Европа"
+            android:background="#524FDC"
+            android:textColor="@color/white"
+            android:fontFamily="@font/montserrat_medium"
+            android:paddingVertical="15dp"
+            android:layout_marginLeft="100dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+        <ImageView
+            android:id="@+id/img_euro_close"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginRight="-20dp"
+            android:elevation="2dp"
+            android:src="@drawable/globe_bg_continent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="-20dp"
+            android:src="@drawable/icon_bitcoin"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/bitcoin"
+            app:layout_constraintBottom_toBottomOf="@id/bitcoin"
+            app:layout_constraintRight_toLeftOf="@id/bitcoin"/>
+        <TextView
+            android:id="@+id/bitcoin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-1250"
+            android:textSize="20sp"
+            android:textColor="#BB8140"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_bitcoin_bg_cards"
+            android:paddingHorizontal="15dp"
+            android:layout_marginRight="-10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/img_euro_close"
+            app:layout_constraintTop_toBottomOf="@id/diamond"
+            />
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="-15dp"
+            android:src="@drawable/icon_diamond"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/diamond"
+            app:layout_constraintBottom_toBottomOf="@id/diamond"
+            app:layout_constraintRight_toLeftOf="@id/diamond"/>
+        <TextView
+            android:id="@+id/diamond"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-12"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_diamond_bg_cards"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/img_euro_close"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bitcoin"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="-100dp"
         android:layout_marginTop="20dp"
+        android:visibility="invisible"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/center"
         app:layout_constraintTop_toBottomOf="@id/card1">
@@ -165,14 +276,117 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+<!--card3-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card3_no"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginRight="-100dp"
+        android:layout_marginTop="20dp"
+        android:elevation="5dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card2"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card3_close"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="-100dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card2">
+        <Button
+            android:id="@+id/btn_usa_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Америка"
+            android:textSize="25sp"
+            android:textAllCaps="false"
+            android:background="#524FDC"
+            android:textColor="@color/white"
+            android:fontFamily="@font/montserrat_medium"
+            android:paddingVertical="15dp"
+            android:layout_marginRight="100dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
+
+        <ImageView
+            android:id="@+id/img_usa_close"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginLeft="-20dp"
+            android:elevation="2dp"
+            android:src="@drawable/globe_bg_continent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="-20dp"
+            android:src="@drawable/icon_bitcoin"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/bitcoin2"
+            app:layout_constraintBottom_toBottomOf="@id/bitcoin2"
+            app:layout_constraintRight_toLeftOf="@id/bitcoin2"/>
+        <TextView
+            android:id="@+id/bitcoin2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-2850"
+            android:textSize="20sp"
+            android:textColor="#BB8140"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_bitcoin_bg_cards"
+            android:paddingHorizontal="15dp"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintLeft_toLeftOf="@id/img_usa_close"
+            app:layout_constraintRight_toRightOf="@id/img_usa_close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/diamond2"
+            />
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="-15dp"
+            android:src="@drawable/icon_diamond"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/diamond2"
+            app:layout_constraintBottom_toBottomOf="@id/diamond2"
+            app:layout_constraintRight_toLeftOf="@id/diamond2"/>
+        <TextView
+            android:id="@+id/diamond2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-24"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_diamond_bg_cards"
+            android:paddingHorizontal="15dp"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintLeft_toLeftOf="@id/img_usa_close"
+            app:layout_constraintRight_toRightOf="@id/img_usa_close"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bitcoin2"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="-100dp"
         android:layout_marginTop="20dp"
+        android:visibility="invisible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@id/center"
         app:layout_constraintTop_toBottomOf="@id/card2">
@@ -214,13 +428,116 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+<!--card4-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card4_no"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginLeft="-100dp"
+        android:layout_marginTop="20dp"
+        android:elevation="5dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card3"/>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card4_close"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="-100dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/center"
+        app:layout_constraintTop_toBottomOf="@id/card3">
+        <Button
+            android:id="@+id/btn_africa_close"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Африка"
+            android:textSize="25sp"
+            android:textAllCaps="false"
+            android:background="#524FDC"
+            android:textColor="@color/white"
+            android:fontFamily="@font/montserrat_medium"
+            android:paddingVertical="15dp"
+            android:layout_marginLeft="100dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"/>
 
+        <ImageView
+            android:id="@+id/img_africa_close"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginRight="-20dp"
+            android:elevation="2dp"
+            android:src="@drawable/globe_bg_continent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginRight="-20dp"
+            android:src="@drawable/icon_bitcoin"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/bitcoin3"
+            app:layout_constraintBottom_toBottomOf="@id/bitcoin3"
+            app:layout_constraintRight_toLeftOf="@id/bitcoin3"/>
+        <TextView
+            android:id="@+id/bitcoin3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-6000"
+            android:textSize="20sp"
+            android:textColor="#BB8140"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_bitcoin_bg_cards"
+            android:paddingLeft="15dp"
+            android:paddingRight="10dp"
+            android:layout_marginRight="-10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/img_africa_close"
+            app:layout_constraintTop_toBottomOf="@id/diamond3"
+            />
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="-15dp"
+            android:src="@drawable/icon_diamond"
+            android:elevation="4dp"
+            app:layout_constraintTop_toTopOf="@id/diamond3"
+            app:layout_constraintBottom_toBottomOf="@id/diamond3"
+            app:layout_constraintRight_toLeftOf="@id/diamond3"/>
+        <TextView
+            android:id="@+id/diamond3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-36"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:elevation="3dp"
+            android:fontFamily="@font/montserrat_medium"
+            android:background="@drawable/icon_diamond_bg_cards"
+            android:paddingHorizontal="15dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@id/img_africa_close"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/bitcoin3"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="-100dp"
         android:layout_marginTop="20dp"
+        android:visibility="invisible"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="@id/center"
         app:layout_constraintTop_toBottomOf="@id/card3">
@@ -266,7 +583,7 @@
         android:id="@+id/allCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Все карты"
+        android:text="Flag Quiz"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="25sp"

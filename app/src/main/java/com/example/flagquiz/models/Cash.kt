@@ -56,10 +56,59 @@ object Cash {
                 it.putInt("chooseGame", value)
             }
         }
-
-
+    //Click Card
+    var Sound:Boolean?
+        get() = sharedPreferences.getBoolean("Sound",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("Sound", value)
+            }
+        }
+    //Continent
+    var EuroContinnent:Boolean?
+        get() = sharedPreferences.getBoolean("EuroContinnent",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("EuroContinnent", value)
+            }
+        }
+    var AmericaContinnent:Boolean?
+        get() = sharedPreferences.getBoolean("AmericaContinnent",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AmericaContinnent", value)
+            }
+        }
+    var AfricaContinnent:Boolean?
+        get() = sharedPreferences.getBoolean("AfricaContinnent",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AfricaContinnent", value)
+            }
+        }
     //Asia
     //установка уровней
+    var AsiaCard2:Boolean?
+        get() = sharedPreferences.getBoolean("AsiaCard2",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AsiaCard2", value)
+            }
+        }
+    var AsiaCard3:Boolean?
+        get() = sharedPreferences.getBoolean("AsiaCard3",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AsiaCard3", value)
+            }
+        }
+    var AsiaCard4:Boolean?
+        get() = sharedPreferences.getBoolean("AsiaCard4",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AsiaCard4", value)
+            }
+        }
     //Страна
     var AsiaCountLvl1:Int?
         get() = sharedPreferences.getInt("AsiaCountLvl1",1)
@@ -426,6 +475,27 @@ object Cash {
 
     //Euro
     //установка уровней
+    var EuroCard2:Boolean?
+        get() = sharedPreferences.getBoolean("EuroCard2",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("EuroCard2", value)
+            }
+        }
+    var EuroCard3:Boolean?
+        get() = sharedPreferences.getBoolean("EuroCard3",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("EuroCard3", value)
+            }
+        }
+    var EuroCard4:Boolean?
+        get() = sharedPreferences.getBoolean("EuroCard4",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("EuroCard4", value)
+            }
+        }
     //Страна
     var EuroCountLvl1:Int?
         get() = sharedPreferences.getInt("EuroCountLvl1",1)
@@ -793,6 +863,13 @@ object Cash {
 
     //America
     //установка уровней
+    var AmCard2:Boolean?
+        get() = sharedPreferences.getBoolean("AmCard2",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AmCard2", value)
+            }
+        }
     //Страна
     var AmCountLvl1:Int?
         get() = sharedPreferences.getInt("AmCountLvl1",1)
@@ -992,6 +1069,28 @@ object Cash {
 
     //Africa
     //установка уровней
+    var AfricaCard2:Boolean?
+        get() = sharedPreferences.getBoolean("AfricaCard2",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AfricaCard2", value)
+            }
+        }
+    var AfricaCard3:Boolean?
+        get() = sharedPreferences.getBoolean("AfricaCard3",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AfricaCard3", value)
+            }
+        }
+    var AfricaCard4:Boolean?
+        get() = sharedPreferences.getBoolean("AfricaCard4",false)
+        set(value) = Cash.sharedPreferences.edit {
+            if (value != null) {
+                it.putBoolean("AfricaCard4", value)
+            }
+        }
+
     //Страна
     var AfricaCountLvl1:Int?
         get() = sharedPreferences.getInt("AfricaCountLvl1",1)

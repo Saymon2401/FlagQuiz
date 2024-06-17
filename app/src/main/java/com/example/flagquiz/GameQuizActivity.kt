@@ -37,6 +37,8 @@ class GameQuizActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var windowMes:MediaPlayer
     lateinit var backSound:MediaPlayer
     lateinit var butt:MediaPlayer
+    lateinit var win:MediaPlayer
+    lateinit var lose:MediaPlayer
 
     private var wrong = 3 // live
     private var isTimerStarted = false // timer
@@ -57,6 +59,8 @@ class GameQuizActivity : AppCompatActivity(), View.OnClickListener {
         windowMes = MediaPlayer.create(this,R.raw.window)
         backSound = MediaPlayer.create(this,R.raw.back)
         butt = MediaPlayer.create(this,R.raw.button)
+        win = MediaPlayer.create(this,R.raw.win)
+        lose = MediaPlayer.create(this,R.raw.lose)
 
         binding.countBitcoin.text = Cash.bitcoinBalance.toString()
         binding.countDiamond.text = Cash.diamondBalance.toString()
@@ -419,6 +423,7 @@ class GameQuizActivity : AppCompatActivity(), View.OnClickListener {
                         } else {
                             //dialog win
                             windowMes.start()
+                            win.start()
                             val dialogBinding = layoutInflater.inflate(R.layout.dialog_win,null)
                             val dialogWin = Dialog(this)
                             dialogWin.setContentView(dialogBinding)
@@ -1067,6 +1072,7 @@ class GameQuizActivity : AppCompatActivity(), View.OnClickListener {
                             }
                             //dialog lose
                             windowMes.start()
+                            lose.start()
                             val dialogBinding = layoutInflater.inflate(R.layout.dialog_lose,null)
                             val dialogLose = Dialog(this)
                             dialogLose.setContentView(dialogBinding)

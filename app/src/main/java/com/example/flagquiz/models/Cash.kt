@@ -18,7 +18,7 @@ object Cash {
     }
     //Баланс
     var bitcoinBalance:Int?
-        get() = sharedPreferences.getInt("bitcoin",0)
+        get() = sharedPreferences.getInt("bitcoin",9999)
         set(value) = Cash.sharedPreferences.edit {
             if (value != null) {
                 it.putInt("bitcoin", value)
@@ -26,7 +26,7 @@ object Cash {
         }
     //Алмаз
     var diamondBalance:Int?
-        get() = sharedPreferences.getInt("diamond",0)
+        get() = sharedPreferences.getInt("diamond",999)
         set(value) = Cash.sharedPreferences.edit {
             if (value != null) {
                 it.putInt("diamond", value)

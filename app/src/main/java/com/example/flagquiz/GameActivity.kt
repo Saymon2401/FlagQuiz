@@ -35,6 +35,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
     lateinit var windowMes:MediaPlayer
     lateinit var backSound:MediaPlayer
     lateinit var butt:MediaPlayer
+    lateinit var win:MediaPlayer
+    lateinit var lose:MediaPlayer
 
     var isTimerStarted = false // timer
     var elapsedTime:Long = 0 //timer
@@ -57,6 +59,8 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
         windowMes = MediaPlayer.create(this,R.raw.window)
         backSound = MediaPlayer.create(this,R.raw.back)
         butt = MediaPlayer.create(this,R.raw.button)
+        win = MediaPlayer.create(this,R.raw.win)
+        lose = MediaPlayer.create(this,R.raw.lose)
 
         binding.countBitcoin.text = Cash.bitcoinBalance.toString()
         binding.countDiamond.text = Cash.diamondBalance.toString()
@@ -1214,6 +1218,7 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
             button.setBackgroundDrawable(ContextCompat.getDrawable(this,R.drawable.btn_card_bg_true))
             if (countLevel==10){
                 //dialog win
+                win.start()
                 windowMes.start()
                 val dialogBinding = layoutInflater.inflate(R.layout.dialog_win,null)
                 val dialogWin = Dialog(this)
@@ -3103,6 +3108,7 @@ class GameActivity : AppCompatActivity(),View.OnClickListener {
                     }
                 }
                 //dialog lose
+                lose.start()
                 windowMes.start()
                 val dialogBinding = layoutInflater.inflate(R.layout.dialog_lose,null)
                 val dialogLose = Dialog(this)
